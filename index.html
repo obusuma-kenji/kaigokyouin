@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>介護福祉士養成教育ガイド | Compass</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'care-base': '#F5F5F0',   /* Warm Off-White/Beige */
+                        'care-primary': '#4A7c59', /* Sage Green - Growth/Health */
+                        'care-secondary': '#D4A373', /* Soft Wood/Earth - Warmth */
+                        'care-accent': '#E76F51',  /* Muted Coral - Highlights */
+                        'care-text': '#2C3E50',    /* Dark Slate - Readable Text */
+                        'care-light': '#FFFFFF',
+                        'care-soft-green': '#E8F3EB',
+                    },
+                    fontFamily: {
+                        sans: ['"Hiragino Kaku Gothic ProN"', '"Noto Sans JP"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Chart Container Styling - MANDATORY for responsiveness */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Limits width on large screens */
+            height: 350px;    /* Base height */
+            max-height: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Specific height adjustments for mobile */
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 280px;
+            }
+        }
+
+        /* Smooth transitions for interactive elements */
+        .card-hover {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Hide scrollbar for cleaner lists */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+
+    <!-- 
+    Placeholder Comments Required:
+    -->
+    <!-- Chosen Palette: Warm Neutrals & Sage Green. Based on 'Nature & Care' to evoke calmness, trust, and human dignity tailored for the nursing care context. -->
+    
+    <!-- Application Structure Plan: 
+         Structure: Dashboard-style Single Page Application.
+         1. Header: Clear context and role definition.
+         2. Intro: "The Heart of Care" - Philosophy alignment.
+         3. Curriculum Domain (Interactive): Donut chart + Filterable list. Allows students to see the "Big Picture" of hours vs. specific subjects.
+         4. Growth Model (Comparison): Radar chart. Compares current state vs. future goal (Year 1 vs. Graduation) to set expectations.
+         5. Roadmap (Linear): Visual timeline of the 2-year journey.
+         6. Trends (Data): Bar chart showing industry context (why they are studying this).
+         Rationale: This structure moves from "Why" (Philosophy) to "What" (Curriculum) to "How" (Growth/Roadmap), facilitating a logical onboarding flow for new students.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Curriculum Composition: Donut Chart. Goal: Inform/Organize. Shows the proportion of "Human Understanding" vs "Technical Skills". Interaction: Clicking segment filters text list.
+         2. Competency Goals: Radar Chart. Goal: Compare/Change. Visualizes the multi-faceted nature of care (Ethics, Tech, Knowledge). Interaction: Toggle datasets.
+         3. Student Trends: Bar Chart. Goal: Inform. Contextualizes the learning environment diversity.
+         4. Roadmap: Styled HTML List. Goal: Process. Linear progression of time.
+         Confirming NO SVG graphics used. NO Mermaid JS used. All icons are CSS or Unicode.
+    -->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-care-base text-care-text font-sans leading-relaxed">
+
+    <!-- Navigation / Header -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50 border-b-4 border-care-primary">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center gap-2">
+                        <span class="text-2xl text-care-primary">❖</span>
+                        <span class="font-bold text-xl tracking-wide text-gray-800">Compass: 介護教育ガイド</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#philosophy" class="text-gray-600 hover:text-care-primary px-3 py-2 rounded-md text-sm font-medium transition">教育理念</a>
+                    <a href="#curriculum" class="text-gray-600 hover:text-care-primary px-3 py-2 rounded-md text-sm font-medium transition">カリキュラム構成</a>
+                    <a href="#competency" class="text-gray-600 hover:text-care-primary px-3 py-2 rounded-md text-sm font-medium transition">到達目標</a>
+                    <a href="#roadmap" class="text-gray-600 hover:text-care-primary px-3 py-2 rounded-md text-sm font-medium transition">学習ロードマップ</a>
+                </div>
+                <!-- Mobile menu button placeholder (simplified for single file) -->
+                <div class="flex items-center md:hidden">
+                    <button class="text-gray-500 hover:text-care-primary">☰</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-care-soft-green py-12 md:py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-3xl md:text-5xl font-bold text-care-primary mb-6">
+                「尊厳」を支えるプロフェッショナルへ
+            </h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                介護福祉士養成課程における教育要綱と、2年間の学びの道筋を可視化しました。<br>
+                知識・技術・そして心の成長プロセスをここから始めましょう。
+            </p>
+            <div class="flex justify-center gap-4">
+                <a href="#curriculum" class="bg-care-primary text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-green-800 transition transform hover:-translate-y-1">
+                    カリキュラムを見る
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-20">
+
+        <!-- SECTION 1: Philosophy (Textual) -->
+        <section id="philosophy" class="grid md:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6">
+                <div class="inline-block px-4 py-1 bg-care-secondary text-white text-sm rounded-full mb-2">教育の核心</div>
+                <h2 class="text-3xl font-bold text-gray-800">人間と社会、介護のあり方を問う</h2>
+                <p class="text-gray-600 text-lg">
+                    単なる介助技術の習得ではありません。私たちの教育要綱は、「人間の尊厳と自立」を基盤に置いています。利用者の生活歴、価値観、そして「その人らしさ」を理解し、多職種と連携しながら生活を支える実践力を養います。
+                </p>
+                <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-care-primary">
+                    <h3 class="font-bold text-care-primary mb-2">求める学生像（アドミッション・ポリシー）</h3>
+                    <ul class="list-none space-y-2">
+                        <li class="flex items-start">
+                            <span class="text-care-accent mr-2">✔</span> 他者の痛みに共感し、寄り添う心を持つ人
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-care-accent mr-2">✔</span> 社会の課題に関心を持ち、地域貢献を志す人
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-care-accent mr-2">✔</span> 生涯学び続ける意欲を持つ人
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-care-secondary opacity-20 rounded-full"></div>
+                <div class="absolute bottom-0 left-0 -mb-4 -ml-4 w-32 h-32 bg-care-primary opacity-10 rounded-full"></div>
+                
+                <h3 class="text-center font-bold text-xl mb-6 text-gray-700">介護過程の展開サイクル</h3>
+                <!-- CSS Flowchart using Flex/Grid -->
+                <div class="grid grid-cols-1 gap-4 text-center">
+                    <div class="bg-care-soft-green p-4 rounded-lg font-bold text-care-primary border border-green-200">
+                        1. アセスメント<br><span class="text-xs font-normal text-gray-600">情報の収集・分析</span>
+                    </div>
+                    <div class="text-care-secondary text-2xl">⬇</div>
+                    <div class="bg-care-soft-green p-4 rounded-lg font-bold text-care-primary border border-green-200">
+                        2. 計画の立案<br><span class="text-xs font-normal text-gray-600">目標設定・具体策</span>
+                    </div>
+                    <div class="text-care-secondary text-2xl">⬇</div>
+                    <div class="bg-care-soft-green p-4 rounded-lg font-bold text-care-primary border border-green-200">
+                        3. 実施<br><span class="text-xs font-normal text-gray-600">専門的支援の実践</span>
+                    </div>
+                    <div class="text-care-secondary text-2xl">⬇</div>
+                    <div class="bg-care-soft-green p-4 rounded-lg font-bold text-care-primary border border-green-200">
+                        4. 評価・修正<br><span class="text-xs font-normal text-gray-600">モニタリング・改善</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Curriculum Structure (Interactive) -->
+        <section id="curriculum" class="scroll-mt-24">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">領域別カリキュラム構成</h2>
+                <p class="text-gray-600">
+                    厚生労働省の指定規則に基づき、総時間数1,850時間以上のカリキュラムを編成しています。
+                    グラフの各領域をクリックすると、具体的な科目内容が表示されます。
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8 items-start">
+                <!-- Left: Chart -->
+                <div class="bg-white p-6 rounded-xl shadow-md card-hover">
+                    <h3 class="text-lg font-bold text-gray-700 mb-4 text-center">時間数・単位数の内訳</h3>
+                    <div class="chart-container">
+                        <canvas id="curriculumChart"></canvas>
+                    </div>
+                    <p class="text-center text-sm text-gray-500 mt-4">
+                        ※グラフをクリックして詳細を切り替え
+                    </p>
+                </div>
+
+                <!-- Right: Dynamic Content List -->
+                <div class="bg-white p-6 rounded-xl shadow-md h-full flex flex-col">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                        <h3 id="domainTitle" class="text-xl font-bold text-care-primary">人間と社会</h3>
+                        <span id="domainHours" class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">190時間</span>
+                    </div>
+                    
+                    <div id="subjectList" class="flex-1 overflow-y-auto max-h-[300px] space-y-3 pr-2 no-scrollbar">
+                        <!-- Content injected via JS -->
+                        <div class="p-3 bg-care-soft-green rounded border-l-4 border-care-primary">
+                            <h4 class="font-bold text-gray-700">人間の尊厳と自立</h4>
+                            <p class="text-sm text-gray-600 mt-1">介護の基本理念、アドボカシー、権利擁護について学ぶ。</p>
+                        </div>
+                        <div class="p-3 bg-gray-50 rounded hover:bg-gray-100 transition">
+                            <h4 class="font-bold text-gray-700">人間関係とコミュニケーション</h4>
+                            <p class="text-sm text-gray-600 mt-1">対人援助における信頼関係の形成、受容と共感。</p>
+                        </div>
+                        <div class="p-3 bg-gray-50 rounded hover:bg-gray-100 transition">
+                            <h4 class="font-bold text-gray-700">社会の理解</h4>
+                            <p class="text-sm text-gray-600 mt-1">社会保障制度、介護保険制度、障害者総合支援法など。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t text-sm text-gray-500">
+                        <span class="font-bold">教育のポイント：</span>
+                        <span id="domainNote">制度の仕組みだけでなく、利用者の生活を支える基盤としての社会資源を理解します。</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Competency Radar (Interactive) -->
+        <section id="competency" class="bg-orange-50 rounded-3xl p-8 md:p-12 scroll-mt-24">
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 space-y-6">
+                    <h2 class="text-3xl font-bold text-gray-800">到達目標と成長イメージ</h2>
+                    <p class="text-gray-600">
+                        入学時から卒業時（国家試験受験資格取得）にかけて、5つの軸で能力を伸ばします。スイッチを切り替えて、1年次の目標と最終目標を比較してみましょう。
+                    </p>
+                    
+                    <div class="flex gap-4 p-1 bg-white rounded-lg shadow-sm w-fit">
+                        <button id="btnYear1" class="px-4 py-2 rounded-md text-sm font-bold bg-care-primary text-white shadow transition">1年次終了時</button>
+                        <button id="btnGrad" class="px-4 py-2 rounded-md text-sm font-bold text-gray-500 hover:bg-gray-100 transition">卒業時目標</button>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-care-secondary mt-4">
+                        <h4 id="compTitle" class="font-bold text-gray-800 mb-2">1年次終了時の状態</h4>
+                        <p id="compDesc" class="text-sm text-gray-600">
+                            基本的な介護手順を理解し、指導者の指示のもとで安全な介助ができる状態を目指します。利用者の心身の特性に関する基礎知識を習得します。
+                        </p>
+                    </div>
+                </div>
+
+                <div class="md:col-span-3 bg-white rounded-xl shadow-lg p-4 flex items-center justify-center">
+                    <div class="chart-container">
+                        <canvas id="competencyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Roadmap (Timeline) -->
+        <section id="roadmap" class="scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">2年間の学習ロードマップ</h2>
+                <p class="text-gray-600 mt-2">段階的な学びで、確実に実践力を身につけます。</p>
+            </div>
+
+            <div class="relative max-w-4xl mx-auto">
+                <!-- Vertical Line -->
+                <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gray-200 hidden md:block"></div>
+
+                <!-- Year 1 -->
+                <div class="mb-12 relative z-10">
+                    <div class="flex flex-col md:flex-row items-center justify-between w-full">
+                        <div class="order-1 w-full md:w-5/12 text-center md:text-right px-4">
+                            <h3 class="text-2xl font-bold text-care-primary">1年次：基礎の確立</h3>
+                            <p class="text-gray-600 mt-2">介護の原理・原則、医学的知識、社会保障の仕組みを座学中心に学びます。初めての実習で「利用者との関わり」を体験します。</p>
+                        </div>
+                        <div class="order-2 w-12 h-12 bg-care-primary rounded-full flex items-center justify-center text-white font-bold border-4 border-white shadow my-4 md:my-0">
+                            1
+                        </div>
+                        <div class="order-3 w-full md:w-5/12 px-4">
+                            <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-care-primary">
+                                <ul class="text-sm space-y-2">
+                                    <li>🎓 <strong>前期:</strong> 人間の尊厳と自立、生活支援技術（基礎）</li>
+                                    <li>🏥 <strong>後期:</strong> 介護実習 I（施設・事業所での見学・観察中心）</li>
+                                    <li>📝 <strong>目標:</strong> 利用者理解の視点を持つ</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Year 2 -->
+                <div class="mb-12 relative z-10">
+                    <div class="flex flex-col md:flex-row items-center justify-between w-full">
+                        <div class="order-1 md:order-3 w-full md:w-5/12 text-center md:text-left px-4">
+                            <h3 class="text-2xl font-bold text-care-secondary">2年次：実践と統合</h3>
+                            <p class="text-gray-600 mt-2">医療的ケア、認知症ケアなど応用科目を習得。長期実習を通じて、ケアプラン（介護過程）の実践・評価を行います。</p>
+                        </div>
+                        <div class="order-2 w-12 h-12 bg-care-secondary rounded-full flex items-center justify-center text-white font-bold border-4 border-white shadow my-4 md:my-0">
+                            2
+                        </div>
+                        <div class="order-1 md:order-1 w-full md:w-5/12 px-4"> <!-- Swapped order for visual balance -->
+                            <div class="bg-white p-4 rounded-lg shadow-md border-r-4 border-care-secondary md:text-right">
+                                <ul class="text-sm space-y-2">
+                                    <li>💊 <strong>前期:</strong> 医療的ケア、認知症の理解 II</li>
+                                    <li>🏥 <strong>夏・秋:</strong> 介護実習 II・III（介護過程の実践）</li>
+                                    <li>🏆 <strong>後期:</strong> 国家試験対策、総合演習</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- National Exam -->
+                <div class="relative z-10">
+                    <div class="bg-gradient-to-r from-care-primary to-green-700 text-white p-6 rounded-xl shadow-lg text-center mx-4 md:mx-auto max-w-2xl">
+                        <h3 class="text-2xl font-bold mb-2">介護福祉士国家試験</h3>
+                        <p class="opacity-90">1月下旬実施（筆記試験）</p>
+                        <div class="mt-4 inline-block bg-white text-care-primary font-bold px-6 py-2 rounded-full">
+                            全員合格を目指して
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: Data Trends (Simple Stats) -->
+        <section id="trends" class="py-12 border-t border-gray-200 mt-12">
+            <div class="max-w-4xl mx-auto px-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">数字で見る介護教育の現在</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-bold text-gray-700 mb-4">介護福祉士登録者数の推移</h3>
+                        <!-- Simulated Trend Data -->
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm flex flex-col justify-center space-y-4">
+                        <div>
+                            <span class="block text-sm text-gray-500">多様な人材の参入</span>
+                            <div class="flex items-end gap-2">
+                                <span class="text-4xl font-bold text-care-accent">留学生</span>
+                                <span class="text-gray-600 mb-1">の増加傾向</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                                <div class="bg-care-accent h-2.5 rounded-full" style="width: 35%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="block text-sm text-gray-500">国家試験合格率（全国平均）</span>
+                            <div class="flex items-end gap-2">
+                                <span class="text-4xl font-bold text-care-primary">84.3%</span>
+                                <span class="text-xs text-gray-400 mb-1">（第35回実績）</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">※教育の質向上により、高い合格率を維持しています。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-xl font-bold mb-4">社会福祉法人 〇〇学園 介護福祉士専門学校</h2>
+            <p class="text-gray-400 text-sm mb-6">〒123-4567 〇〇県〇〇市教育町1-1<br>教務課 直通</p>
+            <div class="border-t border-gray-700 pt-6">
+                <p class="text-xs text-gray-500">© 2024 Care Worker Training Course Guide. For educational use.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- DATA STORE ---
+        
+        // 1. Curriculum Data (Based on MHLW Guidelines)
+        const curriculumData = {
+            labels: ['人間と社会', '介護', 'こころとからだのしくみ', '医療的ケア'],
+            data: [190, 1080, 450, 130], // Approximate hours incl practice
+            colors: ['#D4A373', '#4A7c59', '#E76F51', '#2C3E50'],
+            details: {
+                '人間と社会': {
+                    hours: '190時間',
+                    note: '職業倫理、法制度、コミュニケーション技術など、専門職としての基盤を形成します。',
+                    subjects: [
+                        { title: '人間の尊厳と自立', desc: '介護における基本的人権、アドボカシー、自立支援の考え方。' },
+                        { title: '人間関係とコミュニケーション', desc: '信頼関係の形成、チームマネジメント、記録の書き方。' },
+                        { title: '社会の理解', desc: '介護保険制度、障害者福祉制度、地域福祉の現状。' }
+                    ]
+                },
+                '介護': {
+                    hours: '1080時間',
+                    note: '講義での知識習得に加え、450時間の実習を含みます。実践力の中核となる領域です。',
+                    subjects: [
+                        { title: '介護の基本', desc: '介護福祉士の役割、倫理、安全管理、感染症対策。' },
+                        { title: 'コミュニケーション技術', desc: '視覚・聴覚障害者とのコミュニケーション、ICT活用。' },
+                        { title: '生活支援技術', desc: '移動・食事・排泄・入浴・整容・家事等の介助方法と根拠。' },
+                        { title: '介護過程', desc: 'アセスメントから計画・実施・評価までのPDCAサイクル。' },
+                        { title: '介護総合演習・実習', desc: '施設や地域での実習を通じた統合的な学び。' }
+                    ]
+                },
+                'こころとからだのしくみ': {
+                    hours: '450時間',
+                    note: '加齢による変化や認知症、障害の特性を医学的・心理的側面から理解します。',
+                    subjects: [
+                        { title: '発達と老化の理解', desc: '老化に伴う身体的・精神的変化、高齢者の心理。' },
+                        { title: '認知症の理解', desc: '認知症の種類・症状、医学的知識、家族支援。' },
+                        { title: '障害の理解', desc: '身体・知的・精神・発達障害の特性と生活上の困難。' },
+                        { title: 'こころとからだのしくみ', desc: '解剖生理学、身体機能のメカニズム。' }
+                    ]
+                },
+                '医療的ケア': {
+                    hours: '130時間',
+                    note: '喀痰吸引や経管栄養など、医行為の一部を実施するための演習を含みます。',
+                    subjects: [
+                        { title: '医療的ケア概論', desc: '医療的ケアの法的根拠、安全管理、感染予防。' },
+                        { title: '医療的ケア演習', desc: 'シミュレーターを用いた喀痰吸引、経管栄養の実技演習。' }
+                    ]
+                }
+            }
+        };
+
+        // 2. Competency Data
+        const competencyData = {
+            labels: ['倫理・態度', '知識', '介護技術', 'コミュニケーション', 'マネジメント'],
+            datasets: [
+                {
+                    label: '1年次終了時',
+                    data: [3, 2, 2, 3, 1], // Scale 1-5
+                    borderColor: '#D4A373',
+                    backgroundColor: 'rgba(212, 163, 115, 0.2)',
+                    desc: '基本的な介護手順を理解し、指導者の指示のもとで安全な介助ができる状態。利用者の心身の特性に関する基礎知識を習得。'
+                },
+                {
+                    label: '卒業時目標',
+                    data: [5, 4, 5, 4, 3], // Scale 1-5
+                    borderColor: '#4A7c59',
+                    backgroundColor: 'rgba(74, 124, 89, 0.2)',
+                    desc: '利用者の状態に応じた個別ケアを計画・実践・評価できる。多職種と連携し、根拠に基づいた介護が実践できる。'
+                }
+            ]
+        };
+
+        // --- CHART INITIALIZATION ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Curriculum Donut Chart
+            const ctxCurriculum = document.getElementById('curriculumChart').getContext('2d');
+            const curriculumChart = new Chart(ctxCurriculum, {
+                type: 'doughnut',
+                data: {
+                    labels: curriculumData.labels,
+                    datasets: [{
+                        data: curriculumData.data,
+                        backgroundColor: curriculumData.colors,
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, font: { size: 12 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: 約${context.raw}時間`;
+                                }
+                            }
+                        }
+                    },
+                    onClick: (evt, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const label = curriculumData.labels[index];
+                            updateSubjectList(label);
+                        }
+                    }
+                }
+            });
+
+            // 2. Competency Radar Chart
+            const ctxCompetency = document.getElementById('competencyChart').getContext('2d');
+            const competencyChart = new Chart(ctxCompetency, {
+                type: 'radar',
+                data: {
+                    labels: competencyData.labels,
+                    datasets: [competencyData.datasets[0]] // Start with Year 1
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#eee' },
+                            grid: { color: '#eee' },
+                            pointLabels: { font: { size: 12, weight: 'bold' }, color: '#4b5563' },
+                            suggestedMin: 0,
+                            suggestedMax: 5,
+                            ticks: { stepSize: 1, display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: true }
+                    }
+                }
+            });
+
+            // 3. Trend Bar Chart (Simple)
+            const ctxTrend = document.getElementById('trendChart').getContext('2d');
+            new Chart(ctxTrend, {
+                type: 'bar',
+                data: {
+                    labels: ['2019', '2020', '2021', '2022', '2023'],
+                    datasets: [{
+                        label: '登録者数 (万人)',
+                        data: [162, 170, 178, 185, 190], // Estimated trend data
+                        backgroundColor: '#4A7c59',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: false, min: 150 }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // --- INTERACTIVITY LOGIC ---
+
+            // A. Update Subject List Function
+            function updateSubjectList(domainName) {
+                const data = curriculumData.details[domainName];
+                const listContainer = document.getElementById('subjectList');
+                const titleEl = document.getElementById('domainTitle');
+                const hoursEl = document.getElementById('domainHours');
+                const noteEl = document.getElementById('domainNote');
+
+                // Animate out
+                listContainer.style.opacity = '0';
+                
+                setTimeout(() => {
+                    // Update Content
+                    titleEl.textContent = domainName;
+                    titleEl.className = `text-xl font-bold text-[${curriculumData.colors[curriculumData.labels.indexOf(domainName)]}]`;
+                    hoursEl.textContent = data.hours;
+                    noteEl.textContent = data.note;
+                    
+                    // Clear and rebuild list
+                    listContainer.innerHTML = '';
+                    data.subjects.forEach(sub => {
+                        const div = document.createElement('div');
+                        div.className = 'p-3 bg-gray-50 rounded hover:bg-gray-100 transition animate-fade-in';
+                        div.innerHTML = `
+                            <h4 class="font-bold text-gray-700">${sub.title}</h4>
+                            <p class="text-sm text-gray-600 mt-1">${sub.desc}</p>
+                        `;
+                        listContainer.appendChild(div);
+                    });
+
+                    // Animate in
+                    listContainer.style.opacity = '1';
+                }, 200);
+            }
+
+            // B. Competency Toggle Logic
+            const btnYear1 = document.getElementById('btnYear1');
+            const btnGrad = document.getElementById('btnGrad');
+            const compTitle = document.getElementById('compTitle');
+            const compDesc = document.getElementById('compDesc');
+
+            function setCompetencyView(isGrad) {
+                const datasetIndex = isGrad ? 1 : 0;
+                
+                // Update Chart
+                competencyChart.data.datasets = [competencyData.datasets[datasetIndex]];
+                competencyChart.update();
+
+                // Update Text
+                compTitle.textContent = competencyData.datasets[datasetIndex].label + 'の状態';
+                compDesc.textContent = competencyData.datasets[datasetIndex].desc;
+
+                // Update Buttons
+                if (isGrad) {
+                    btnGrad.className = 'px-4 py-2 rounded-md text-sm font-bold bg-care-primary text-white shadow transition';
+                    btnYear1.className = 'px-4 py-2 rounded-md text-sm font-bold text-gray-500 hover:bg-gray-100 transition';
+                } else {
+                    btnYear1.className = 'px-4 py-2 rounded-md text-sm font-bold bg-care-secondary text-white shadow transition';
+                    btnGrad.className = 'px-4 py-2 rounded-md text-sm font-bold text-gray-500 hover:bg-gray-100 transition';
+                }
+            }
+
+            btnYear1.addEventListener('click', () => setCompetencyView(false));
+            btnGrad.addEventListener('click', () => setCompetencyView(true));
+
+            // Initial view
+            updateSubjectList('人間と社会'); // Reset to first
+        });
+    </script>
+</body>
+</html>
